@@ -1,65 +1,77 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Card } from "@/components/ui/Card";
+import { GridBackground } from "@/components/layout/GridBackground";
+import { ShoppingBag, Terminal } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <GridBackground>
+      {/* Navigation */}
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+        <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-sm border border-stone-200 flex gap-6 text-sm font-medium text-stone-600">
+          <Link href="/projects" className="hover:text-stone-900 transition-colors">
+            Projects
+          </Link>
+          <Link href="/shop" className="hover:text-stone-900 transition-colors">
+            Shop
+          </Link>
+          <Link href="/about" className="hover:text-stone-900 transition-colors">
+            About
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </nav>
+
+      <main className="flex flex-col items-center justify-center min-h-screen p-4 relative overflow-hidden">
+
+        {/* Main Title Card -> Now Logo Image */}
+        <div className="z-10 relative">
+          <img
+            src="/logo.png"
+            alt="Lester Labs"
+            className="w-full max-w-lg drop-shadow-sm"
+          />
         </div>
+
+        {/* Sticky Note: Shop (Moved further left/top) */}
+        <Link href="/shop" className="absolute top-[10%] left-[2%] md:left-[10%] z-20 hover:z-30 block group">
+          <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 text-stone-900 p-6 w-48 h-48 md:w-56 md:h-56 shadow-[2px_10px_20px_rgba(0,0,0,0.15)] -rotate-6 group-hover:-rotate-3 transition-all duration-300 font-hand text-2xl flex flex-col items-center justify-center leading-tight text-center relative after:content-[''] after:absolute after:bottom-1 after:right-1 after:w-full after:h-full after:bg-black/5 after:blur-md after:-z-10 rounded-sm">
+            {/* Tape effect (Optional, can add later) */}
+            <span className="relative z-10">Check out the Shop!</span>
+            <ShoppingBag className="w-10 h-10 mt-3 opacity-80 relative z-10" />
+          </div>
+        </Link>
+
+        {/* Decorative Product Card: Sample (Moved further right/top) */}
+        <div className="absolute top-[15%] right-[2%] md:right-[15%] z-30 pointer-events-none">
+          <img
+            src="/stickers.png"
+            alt="Cute Stickers"
+            className="w-40 h-40 md:w-48 md:h-48 rotate-6 drop-shadow-md mix-blend-multiply"
+          />
+        </div>
+
+        {/* Code Card: Projects (Moved further bottom/right) */}
+        <Link href="/projects" className="absolute bottom-[5%] right-[2%] md:right-[10%] z-20 hover:z-30 block">
+          <Card
+            className="bg-stone-900 text-stone-50 border-stone-800 w-64 md:w-72 rotate-2 hover:rotate-0 transition-all duration-300 p-0 overflow-hidden shadow-xl"
+            whileHover={{ scale: 1.05, rotate: 0 }}
+          >
+            {/* MacOS Window Controls */}
+            <div className="bg-stone-800 px-4 py-3 flex gap-2 border-b border-stone-700">
+              <div className="w-3 h-3 rounded-full bg-red-500" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500" />
+              <div className="w-3 h-3 rounded-full bg-green-500" />
+            </div>
+            <div className="p-6 font-mono text-sm text-green-400">
+              <p className="mb-2 opacity-50 text-xs">user@lester-labs:~</p>
+              <p>&gt; np run projects</p>
+              <p className="text-stone-400 mt-2">{"//"} Explore AI & Code</p>
+              <Terminal className="w-10 h-10 mt-6 text-white opacity-80" />
+            </div>
+          </Card>
+        </Link>
+
       </main>
-    </div>
+    </GridBackground>
   );
 }
