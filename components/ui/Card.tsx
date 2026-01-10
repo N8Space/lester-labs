@@ -1,13 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, TargetAndTransition } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface CardProps {
     children: React.ReactNode;
     className?: string;
     rotate?: number;
-    whileHover?: object;
+    whileHover?: TargetAndTransition;
 }
 
 export function Card({ children, className, rotate = 0, whileHover }: CardProps) {
