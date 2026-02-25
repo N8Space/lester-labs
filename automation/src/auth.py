@@ -1,3 +1,5 @@
+import os
+import json
 import os.path
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -13,28 +15,60 @@ SCOPES = [
 ]
 
 def authenticate_google_services(client_secret_file='credentials.json', token_file='token.json'):
-    """Shows basic usage of the Gmail API.
-    Lists the user's Gmail labels.
+    """Authenticate with Google APIs.
+
+    This function supports reading client secrets and tokens from environment
+    variables to avoid storing secrets in repository files. Supported env vars:
+
+    - `GOOGLE_CLIENT_SECRETS_JSON`: full client_secrets JSON (preferred)
+    - `GOOGLE_CLIENT_SECRET_FILE`: path to client secrets file
+    - `GOOGLE_TOKEN_JSON`: full token JSON (optional)
+    - `GOOGLE_TOKEN_FILE`: path to token file to read/write (optional)
+
+    If env vars are not provided, falls back to the legacy file-based behavior.
     """
+
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists(token_file):
-        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
+
+    # Try token from env var first
+    token_json_env = os.getenv('GOOGLE_TOKEN_JSON')
+    token_file_env = os.getenv('GOOGLE_TOKEN_FILE')
+    if token_json_env:
+        try:
+            info = json.loads(token_json_env)
+            creds = Credentials.from_authorized_user_info(info, SCOPES)
+        except Exception:
+            creds = None
+
+    # Try token file (env-specified or default)
+    if not creds:
+        tf = token_file_env or token_file
+        if tf and os.path.exists(tf):
+            creds = Credentials.from_authorized_user_file(tf, SCOPES)
+
+    # If there are no (valid) credentials available, run auth flow
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            if not os.path.exists(client_secret_file):
-                raise FileNotFoundError(f"Client secrets file '{client_secret_file}' not found. Please download it from Google Cloud Console.")
-            
-            flow = InstalledAppFlow.from_client_secrets_file(
-                client_secret_file, SCOPES)
+            # First try client secrets from env var
+            client_secrets_env = os.getenv('GOOGLE_CLIENT_SECRETS_JSON')
+            client_secret_file_env = os.getenv('GOOGLE_CLIENT_SECRET_FILE')
+            if client_secrets_env:
+                client_config = json.loads(client_secrets_env)
+                flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
+            else:
+                cs_file = client_secret_file_env or client_secret_file
+                if not os.path.exists(cs_file):
+                    raise FileNotFoundError(f"Client secrets file '{cs_file}' not found. Provide it or set GOOGLE_CLIENT_SECRETS_JSON in the environment.")
+                flow = InstalledAppFlow.from_client_secrets_file(cs_file, SCOPES)
+
             creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open(token_file, 'w') as token:
-            token.write(creds.to_json())
-            
+
+        # Save the credentials for the next run if a writable file path is available
+        save_path = token_file_env or token_file
+        if save_path:
+            with open(save_path, 'w') as token:
+                token.write(creds.to_json())
+
     return creds

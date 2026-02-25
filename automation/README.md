@@ -25,9 +25,20 @@ This Python tool automates your inbox using the **Getting Things Done (GTD)** me
 
 ### 2. Google Cloud Credentials (Important!)
 To access your Gmail and Tasks, you need an OAuth Client ID.
+
+You can provide credentials either via environment variables (recommended) or a local file.
+
+Option A — Environment variables (recommended):
+
+1.  Set `GOOGLE_CLIENT_SECRETS_JSON` to the full client_secrets JSON content from Google Cloud (paste the JSON string).
+2.  Optionally set `GOOGLE_TOKEN_JSON` to a previously-generated token JSON, or set `GOOGLE_TOKEN_FILE` to a path where the token should be stored (ensure that path is gitignored).
+3.  Add your email(s) as "Test Users" in the OAuth Consent Screen.
+
+Option B — File-based (legacy):
+
 1.  Enable **Gmail API**, **Google Tasks API**, and **Google Calendar API**.
 2.  Create **OAuth Desktop App** credentials.
-3.  Download and save as `credentials.json` in this folder.
+3.  Download and save the client secrets as `credentials.json` in this folder (or set `GOOGLE_CLIENT_SECRET_FILE` to another path).
 4.  Add your email(s) as "Test Users" in the OAuth Consent Screen.
 
 ## Running the Script
