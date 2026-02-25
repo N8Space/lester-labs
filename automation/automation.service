@@ -1,0 +1,14 @@
+[Unit]
+Description=Email Automation
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/automation
+EnvironmentFile=/etc/automation/.env
+ExecStart=/root/automation/venv/bin/python /root/automation/main.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

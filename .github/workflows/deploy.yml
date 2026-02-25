@@ -1,0 +1,65 @@
+name: CI Deploy to VPS
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+
+      - name: Create deploy artifact (exclude secrets)
+        run: |
+          tar --exclude='.git' --exclude='venv' --exclude='automation/credentials.json' --exclude='automation/token_*.json' --exclude='.env' -czf deploy.tar.gz .
+
+      - name: Create env file from secrets
+        run: |
+          cat > .env.deploy <<EOF
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_CLIENT_SECRETS_JSON='${{ secrets.GOOGLE_CLIENT_SECRETS_JSON }}'
+          GOOGLE_TOKEN_JSON='${{ secrets.GOOGLE_TOKEN_JSON }}'
+          EOF
+
+      - name: Copy artifact and env file to VPS
+        run: |
+          scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy.tar.gz
+          scp -o StrictHostKeyChecking=no .env.deploy ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/.env.deploy
+
+      - name: Remote deploy: extract, install, write env, restart service
+        env:
+          SERVICE_NAME: automation.service
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          set -e
+          sudo mkdir -p /root/automation
+          sudo tar -C /root/automation -xzf /tmp/deploy.tar.gz
+          # place env file securely
+          sudo mkdir -p /etc/automation
+          sudo mv /tmp/.env.deploy /etc/automation/.env
+          sudo chown root:root /etc/automation/.env
+          sudo chmod 600 /etc/automation/.env
+          # create tokens dir
+          sudo mkdir -p /root/.automation/tokens
+          sudo chown root:root /root/.automation/tokens
+          sudo chmod 700 /root/.automation/tokens
+          # install requirements and venv
+          if [ ! -f /root/automation/venv/bin/pip ]; then
+            sudo python3 -m venv /root/automation/venv
+          fi
+          sudo /root/automation/venv/bin/pip install -r /root/automation/requirements.txt
+          # install/enable systemd unit if provided
+          if [ -f /root/automation/automation.service ]; then
+            sudo mv /root/automation/automation.service /etc/systemd/system/automation.service
+            sudo systemctl daemon-reload
+            sudo systemctl enable automation.service
+            sudo systemctl restart automation.service
+          fi
+          EOF
