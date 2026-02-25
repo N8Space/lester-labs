@@ -67,6 +67,11 @@ def main():
     # 1. Process Each Account
     for account in ACCOUNTS:
         print(f"\nProcessing Account: {account['name']} ({account['email']})...")
+        # Allow overriding token file per-account via env var, e.g.
+        # GOOGLE_TOKEN_FILE_NSLPUBLISHING or GOOGLE_TOKEN_FILE_NATHAN_SCOTT_LESTER
+        env_key = f"GOOGLE_TOKEN_FILE_{account['name'].upper()}"
+        account_token_file = os.getenv(env_key) or os.getenv('GOOGLE_TOKEN_FILE') or account.get('token_file')
+        account['token_file'] = account_token_file
         
         try:
             creds = authenticate_google_services(token_file=account['token_file'])
