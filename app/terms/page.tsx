@@ -64,7 +64,7 @@ export default function TermsOfService() {
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4">7. Contact Us</h2>
                         <p>
-                            For legal inquiries or support regarding these terms, please contact us at: <a href="mailto:support@lesterlabs.cloud" className="text-teal-400 hover:text-teal-300 transition-colors">support@lesterlabs.cloud</a>
+                            For legal inquiries or support regarding these terms, please contact us at: <a href="mailto:nathan@lesterlabs.cloud" className="text-teal-400 hover:text-teal-300 transition-colors">support@lesterlabs.cloud</a>
                         </p>
                     </section>
                 </div>

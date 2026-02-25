@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4">5. Contact Us</h2>
                         <p>
-                            If you have any questions about this Privacy Policy, please contact us at: <a href="mailto:support@lesterlabs.cloud" className="text-teal-400 hover:text-teal-300 transition-colors">support@lesterlabs.cloud</a>
+                            If you have any questions about this Privacy Policy, please contact us at: <a href="mailto:nathan@lesterlabs.cloud" className="text-teal-400 hover:text-teal-300 transition-colors">support@lesterlabs.cloud</a>
                         </p>
                     </section>
                 </div>
